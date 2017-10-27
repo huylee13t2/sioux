@@ -162,7 +162,7 @@ def thong_tin_mon_hoc(req):
 				'gioi_han' : mon_hoc.gioi_han,
 				'da_dang_ky' : mon_hoc.da_dang_ky,
 				'so_tin_chi' : mon_hoc.so_tin_chi,
-				'ma_giang_vien' : obj.ma_giang_vien,
+				'ma_giang_vien' : giang_vien.ma_giang_vien,
 				'ten_giang_vien' : giang_vien.ten_giang_vien,
 			}
 		}
@@ -178,14 +178,14 @@ def thong_tin_mon_hoc(req):
 @csrf_exempt
 def dang_ky(req):
 
-	username = req.POST.get('ma_sinh_vien')
+	ma_sinh_vien = req.POST.get('ma_sinh_vien')
 	ma_hoc_phan = req.POST.get('ma_hoc_phan')
 
 	try:
 		sinh_vien = SinhVien.objects.get(ma_sinh_vien = ma_sinh_vien)
 		mon_hoc = MonHoc.objects.get(ma_hoc_phan = ma_hoc_phan)
 
-		obj = SinhVien_MonHoc(ma_sinh_vien = sinh_vien.ma_sinh_vien, ma_hoc_phan=mon_hoc.ma_hoc_phan)
+		obj = SinhVien_MonHoc(ma_sinh_vien = sinh_vien, ma_hoc_phan=mon_hoc)
 		obj.save()
 
 		response = {
@@ -203,16 +203,15 @@ def dang_ky(req):
 @csrf_exempt
 def huy_dang_ky(req):
 
-	username = req.POST.get('ma_sinh_vien')
+	ma_sinh_vien = req.POST.get('ma_sinh_vien')
 	ma_hoc_phan = req.POST.get('ma_hoc_phan')
 
 	try:
 		sinh_vien = SinhVien.objects.get(ma_sinh_vien = ma_sinh_vien)
 		mon_hoc = MonHoc.objects.get(ma_hoc_phan = ma_hoc_phan)
+		obj = SinhVien_MonHoc.objects.filter(Q(ma_sinh_vien=sinh_vien) & Q(ma_hoc_phan=mon_hoc))
 
-		obj = SinhVien_MonHoc.objects.filter(Q(ma_sinh_vien=sinh_vien.ma_sinh_vien) & Q(ma_hoc_phan=mon_hoc.ma_hoc_phan))
-
-		if(obj.length > 0):
+		if(len(obj) > 0):
 			obj.delete()
 
 			response = {
@@ -233,11 +232,10 @@ def huy_dang_ky(req):
 @csrf_exempt
 def danh_sach_da_dang_ky(req):
 
-	username = req.POST.get('ma_sinh_vien')
-
+	ma_sinh_vien = req.POST.get('ma_sinh_vien')
 	try:
-		sinh_vien = SinhVien.objects.get(user__username = username)
-		sinh_vien_mon_hoc = SinhVien_MonHoc.objects.filter(Q(ma_sinh_vien = sinh_vien.ma_sinh_vien) & Q(active = True))
+		sinh_vien = SinhVien.objects.get(ma_sinh_vien = ma_sinh_vien)
+		sinh_vien_mon_hoc = SinhVien_MonHoc.objects.filter(Q(ma_sinh_vien = sinh_vien) & Q(active = True))
 
 		list_mon_hoc = []
 		for obj in sinh_vien_mon_hoc:
