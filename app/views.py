@@ -14,9 +14,9 @@ def main(req):
 
 # account
 @csrf_exempt
-def login(req):
-	username = req.POST.get('ma_sinh_vien')
-	password = req.POST.get('mat_khau')
+def login(request):
+	username = request.POST.get('ma_sinh_vien')
+	password = request.POST.get('mat_khau')
 
 	try:
 		sinh_vien = SinhVien.objects.get(user__username = username)
@@ -24,13 +24,12 @@ def login(req):
 		if sinh_vien.user.check_password(password):
 			lop = Lop.objects.get(ma_lop = sinh_vien.ma_lop)
 			khoa_hoc = KhoaHoc.objects.get(ma_khoa_hoc = lop.ma_khoa_hoc)
-			khoa_khoahoc = Khoa_KhoaHoc.objects.get(ma_khoa_hoc = khoa_hoc.ma_khoa_hoc)
-			khoa = Khoa.objects.get(ma_khoa = khoa_khoahoc.ma_khoa)
+			khoa = Khoa.objects.get(ma_khoa = lop.ma_khoa)
 
 			response = {
-				'result' : sinh_vien.id,
+				'result' : 1,
 				'data' : {
-					'id' : sinh_vien.username.id,
+					'id' : sinh_vien.user.id,
 					'username' : sinh_vien.user.username,
 					'email' : sinh_vien.email,
 					'ma_sinh_vien' : sinh_vien.ma_sinh_vien,
@@ -69,14 +68,13 @@ def list_all(req):
 		sinh_vien = SinhVien.objects.get(user__username = username)
 		lop = Lop.objects.get(ma_lop = sinh_vien.ma_lop)
 		khoa_hoc = KhoaHoc.objects.get(ma_khoa_hoc = lop.ma_khoa_hoc)
-		khoa_khoahoc = Khoa_KhoaHoc.objects.get(ma_khoa_hoc = khoa_hoc.ma_khoa_hoc)
-		khoa = Khoa.objects.get(ma_khoa = khoa_khoahoc.ma_khoa)
-
-		mon_hoc = MonHoc.objects.filter(Q(ma_khoa = khoa.ma_khoa) & Q(ma_khoa_hoc = khoa_hoc.ma_khoa_hoc))
+		khoa = Khoa.objects.get(ma_khoa = lop.ma_khoa)
+		
+		mon_hoc = MonHoc.objects.filter(Q(ma_khoa = lop.ma_khoa) & Q(ma_khoa_hoc = lop.ma_khoa_hoc))
 
 		list_mon_hoc = []
 
-		for obj in MonHoc:
+		for obj in mon_hoc:
 			giang_vien = GiangVien.objects.get(ma_giang_vien = obj.ma_giang_vien)
 
 			list_mon_hoc.append({
@@ -86,8 +84,8 @@ def list_all(req):
 				'gioi_han' : obj.gioi_han,
 				'da_dang_ky' : obj.da_dang_ky,
 				'so_tin_chi' : obj.so_tin_chi,
-				'ma_giang_vien' : obj.ma_giang_vien,
-				'ten_giang_vien' : obj.ten_giang_vien,
+				'ma_giang_vien' : giang_vien.ma_giang_vien,
+				'ten_giang_vien' : giang_vien.ten_giang_vien,
 				'updated' : obj.updated,
 			})
 
@@ -95,6 +93,7 @@ def list_all(req):
 			'result' : 1,
 			'data' : list_mon_hoc
 		}
+	
 
 	except:
 		response = {
@@ -107,11 +106,12 @@ def list_all(req):
 @csrf_exempt
 def danh_sach_da_chon(req):
 
-	username = req.POST.get('ma_sinh_vien')
+	ma_sinh_vien = req.POST.get('ma_sinh_vien')
 
 	try:
-		sinh_vien = SinhVien.objects.get(user__username = username)
-		sinh_vien_mon_hoc = SinhVien_MonHoc.objects.filter(Q(ma_sinh_vien = sinh_vien.ma_sinh_vien) & Q(active = False))
+		sinh_vien = SinhVien.objects.get(ma_sinh_vien = ma_sinh_vien)
+
+		sinh_vien_mon_hoc = SinhVien_MonHoc.objects.filter(Q(ma_sinh_vien = sinh_vien) & Q(active = False))
 
 		list_mon_hoc = []
 		for obj in sinh_vien_mon_hoc:
@@ -162,7 +162,7 @@ def thong_tin_mon_hoc(req):
 				'gioi_han' : mon_hoc.gioi_han,
 				'da_dang_ky' : mon_hoc.da_dang_ky,
 				'so_tin_chi' : mon_hoc.so_tin_chi,
-				'ma_giang_vien' : giang_vien.ma_giang_vien,
+				'ma_giang_vien' : obj.ma_giang_vien,
 				'ten_giang_vien' : giang_vien.ten_giang_vien,
 			}
 		}

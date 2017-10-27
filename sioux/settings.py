@@ -124,6 +124,14 @@ DATABASES = {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.mysql', 
+    #     'NAME': 'fayaz',
+    #     'USER': 'root',
+    #     'PASSWORD': '2206',
+    #     'HOST': 'localhost',
+    #     'PORT': '3306',
+    # }
 }
 
 
@@ -171,3 +179,6 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'bower_components'),
     os.path.join(BASE_DIR, 'node_modules'),
 ]
+
+MEDIA_URL = 'dist/assets/images/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'dist/')
