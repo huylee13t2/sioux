@@ -29,7 +29,7 @@ SECRET_KEY = 'p^5w_=ke=+oreej8#4^k$v8j23zj2-1ke63!+1ko=v)-g)r@2i'
 DEBUG = True
 
 # ALLOWED_HOSTS = []
-ALLOWED_HOSTS = ['sioux-local.com', 'localhost']
+ALLOWED_HOSTS = ['sioux-local.com', 'localhost', 'sioux.pythonanywhere.com']
 
 
 # Application definition
